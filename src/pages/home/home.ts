@@ -7,6 +7,7 @@ import { GoogleMaps,
          GoogleMapsEvent,
          Marker,
          MarkerOptions,
+         HtmlInfoWindow,
          LatLng
 } from '@ionic-native/google-maps';
 
@@ -34,26 +35,47 @@ export class HomePage {
   // Load the map
   loadMap() {
     const location: LatLng = new LatLng(10.6622214,122.9441217);
+    const locations: Array<{ position: LatLng }> = [
+      {
+        position: new LatLng(10.663772, 122.944702),
+      },
+      {
+        position: new LatLng(10.659501, 122.944316),
+      },
+      {
+        position: new LatLng(10.660819, 122.943082),
+      },
+    ]
+
     const mapElement = this.mapRef.nativeElement;
     const map: GoogleMap = this.googleMaps.create(mapElement);
     const mapOptions: GoogleMapOptions = {
       camera: {
         target: location,
-        zoom: 10
-      }
+        zoom: 15
+      },
+      mapType: 'MAP_TYPE_TERRAIN'
     };
 
     map.one(GoogleMapsEvent.MAP_READY).then(() => {
       map.moveCamera(mapOptions.camera);
 
       this.addMarker(location, map);
+      this.addMarkers(locations, map);
     });
   }
 
   // Add marker in a map.
-  addMarker(position: LatLng, map: GoogleMap) {
+  addMarker(position: LatLng, 
+            map: GoogleMap,
+            content: string = `
+    <h1>Hello world!</h1>
+    <p>The quick brown fox jumps over the lazy dog.</p>
+  `) {
+    const htmlInfoWindow: HtmlInfoWindow<any> = new HtmlInfoWindow;
+    htmlInfoWindow.setContent(content);
+
     const markerOptions: MarkerOptions = {
-      title: 'Sample Marker',
       icon: 'blue',
       animation: 'DROP',
       position: position
@@ -62,9 +84,14 @@ export class HomePage {
        .then((marker: Marker) => {
           marker.on(GoogleMapsEvent.MARKER_CLICK)
                 .subscribe(() => {
-                  alert('Marker clicked');
-                  marker.showInfoWindow();
+                  htmlInfoWindow.open(marker);
                 });
        });
+  }
+
+  addMarkers(locations: Array<{position: LatLng}>, map: GoogleMap) {
+    locations.forEach(location => {
+      this.addMarker(location.position, map);
+    })
   }
 }
