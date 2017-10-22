@@ -1,6 +1,6 @@
 Ionic 3 Google Maps
 
-## A ionic app using @ionic-native/google-maps
+## An Ionic v3 app using @ionic-native/google-maps
 
 This app is an experiment with ionic-native google maps. 
 
